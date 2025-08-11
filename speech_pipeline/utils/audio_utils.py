@@ -6,7 +6,7 @@ import librosa
 
 def fetch_audio_files():
     target_extensions = {".mp3", ".m4a"}
-    search_path = Path('./audio')
+    search_path = Path('./inputs/audio')
     audio_file_list = []
     print(f"Searching for audio files in: {search_path.resolve()}...")
     if not search_path.is_dir():
@@ -14,7 +14,7 @@ def fetch_audio_files():
         return []
     for item in search_path.iterdir():
         if item.is_file() and item.suffix.lower() in target_extensions:
-            audio_file_list.append('./audio/'+item.name)
+            audio_file_list.append('./inputs/audio/'+item.name)
     return audio_file_list
 
 def read_wav(filepath):

@@ -16,13 +16,13 @@ class SpeechPipeline:
                 print("Audio transformation finished")
                 result = self.pipeline_object.generate(raw_speech, return_timestamps=True)
                 print("Speech inferencing finished. Performing embedding")
-                result_to_json(result, './transcripts/')
+                result_to_json(result, './outputs/transcripts/')
         else:
             raw_speech = read_wav(path_to_audio_file)
             print("Audio transformation finished")
             result = self.pipeline_object.generate(raw_speech, return_timestamps=True)
             print("Speech inferencing finished. Performing embedding")
-            result_to_json(result, './transcripts/')
+            result_to_json(result, './outputs/transcripts/')
 
 
 
