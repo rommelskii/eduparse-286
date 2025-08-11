@@ -28,6 +28,7 @@ class RAGPipeline:
         target_data = None
         
         if timestamp in json_files:
+            self.vector_buf = []
             target_path = os.path.join(TRANSCRIPTS_DIR, timestamp)
             with open(target_path, 'r', encoding='utf-8') as file:
                 target_data = json.load(file)
