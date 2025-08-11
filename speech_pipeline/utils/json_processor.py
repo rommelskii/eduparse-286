@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any
 from speech_pipeline.utils.rag_tools import create_embeddings
 
-def result_to_json(result: Any, out_dir: str = ".", time_format: str = "%Y-%m-%dT%H-%M-%S") -> str:
+def result_to_json(result: Any, out_dir: str = ".", embedding_pipeline: Any = None, time_format: str = "%Y-%m-%dT%H-%M-%S") -> str:
     now = datetime.now()
     ts_str = now.strftime(time_format)
     text_lines = []
@@ -18,7 +18,7 @@ def result_to_json(result: Any, out_dir: str = ".", time_format: str = "%Y-%m-%d
                 "start_s": float(chunk.start_ts),
                 "end_s":   float(chunk.end_ts),
                 "text":    chunk.text.strip(),
-                "embedding": create_embeddings(chunk.text.strip())
+                "embedding": embedding_pipeline.create_embeddings(chunk.text.strip())
             }
             for chunk in tqdm(result.chunks)
         ],
