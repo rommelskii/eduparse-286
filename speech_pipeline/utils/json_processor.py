@@ -4,7 +4,7 @@ import openvino_genai
 import os
 from datetime import datetime
 from typing import Any
-from utils.rag_tools import create_embeddings
+from speech_pipeline.utils.rag_tools import create_embeddings
 
 def result_to_json(result: Any, out_dir: str = ".", time_format: str = "%Y-%m-%dT%H-%M-%S") -> str:
     now = datetime.now()

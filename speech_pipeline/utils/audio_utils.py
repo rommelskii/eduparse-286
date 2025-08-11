@@ -1,5 +1,5 @@
 from pathlib import Path
-from utils.defs import *
+from speech_pipeline.utils.defs import *
 import openvino_genai
 import os
 import librosa

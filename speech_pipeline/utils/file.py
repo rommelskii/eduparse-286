@@ -1,4 +1,4 @@
-from utils.defs import *
+from speech_pipeline.utils.defs import *
 
 def save_transcription_to_file(chunks, output_filename):
     try:
