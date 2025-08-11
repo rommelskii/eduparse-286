@@ -5,10 +5,8 @@ from speech_pipeline.utils.json_processor import result_to_json
 
 class SpeechPipeline:
     pipeline_object = openvino_genai.WhisperPipeline('./speech_pipeline/'+MODEL_DIR, "CPU")
-
     def __init__(self):
         pass
-
     def inference(self, path_to_audio_file=None):
         if path_to_audio_file is None:
             for audio_file in fetch_audio_files():
