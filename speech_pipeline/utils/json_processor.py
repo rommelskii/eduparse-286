@@ -1,42 +1,52 @@
 from tqdm import tqdm
-import json
-import openvino_genai
-import os
-from datetime import datetime
 from typing import Any
-from speech_pipeline.utils.rag_tools import create_embeddings
 
-def result_to_json(result: Any, out_dir: str = ".", embedding_pipeline: Any = None, time_format: str = "%Y-%m-%dT%H-%M-%S") -> str:
-    now = datetime.now()
-    ts_str = now.strftime(time_format)
-    text_lines = []
-    
+def format_timestamp(seconds: float) -> str:
+    minutes = int(seconds // 60)
+    secs = int(seconds % 60)
+    return f"{minutes}m {secs}s"
+
+def result_to_json(result: Any, out_dir: str = ".", embedding_pipeline: Any = None, name: str = None, ocr_text: str = None):
+    segments = []
+    all_text_lines = []
+    timestamped_text_lines = []
+
+    print("\n📝 Transcript with Timestamps:\n")
+
+    for chunk in tqdm(result.chunks):
+        text = chunk.text.strip()
+        start = float(chunk.start_ts)
+        end = float(chunk.end_ts)
+
+        # Format timestamps as "Xm Ys"
+        start_str = format_timestamp(start)
+        end_str = format_timestamp(end)
+
+        # Print transcript line
+        print(f"[{start_str} - {end_str}] {text}")
+
+        # Build segment for JSON
+        segments.append({
+            "start_s": start,
+            "end_s": end,
+            "text": text,
+            "embedding": embedding_pipeline.create_embeddings(text)
+        })
+
+        # Collect plain and timestamped lines
+        all_text_lines.append(text)
+        timestamped_text_lines.append(f"[{start_str} - {end_str}] {text}")
+
+    full_text = "\n".join(all_text_lines)
+    timestamped_full_text = "\n".join(timestamped_text_lines)
+
     payload = {
-        "generated_at": ts_str,
-        "segments": [
-            {
-                "start_s": float(chunk.start_ts),
-                "end_s":   float(chunk.end_ts),
-                "text":    chunk.text.strip(),
-                "embedding": embedding_pipeline.create_embeddings(chunk.text.strip())
-            }
-            for chunk in tqdm(result.chunks)
-        ],
+        "session_name": name,
+        "segments": segments,
+        "topic": embedding_pipeline.get_topic(full_text),
+        "outline": embedding_pipeline.get_outline(full_text),
+        "ocr": ocr_text  # Placeholder for future OCR integration
     }
 
-    for chunk in result.chunks:
-        text = chunk.text.strip()
-        line = f"[{chunk.start_ts:.2f} - {chunk.end_ts:.2f}] {text}"
-        text_lines.append(line)
-    
-    filename = f"{ts_str}.json"
-    filepath = os.path.join(out_dir, filename)
-
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2)
-
-    with open(filepath+'.txt', "w", encoding="utf-8") as f:
-        f.write("\n".join(text_lines))
-    
-    return filepath
+    return payload, timestamped_full_text
 
